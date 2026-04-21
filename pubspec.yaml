@@ -1,0 +1,40 @@
+name: masal_dunyasi_v1
+description: "Masal Dunyasi mobile app."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  firebase_core: ^4.7.0
+  flutter_svg: ^2.2.4
+  go_router: ^17.2.2
+  provider: ^6.1.5+1
+  google_fonts: ^8.0.2
+  just_audio: ^0.10.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - "asset/login page/Arkaplan.jpeg"
+    - "asset/avatar page/avatar_optimized.jpeg"
+    - "asset/home page/"
+    - "asset/books/"
+    - "asset/icons/close.svg"
+    - "asset/icons/geri.svg"
+
+  fonts:
+    - family: BreadMateTR
+      fonts:
+        - asset: "asset/fonts/Bread mate tr.otf"

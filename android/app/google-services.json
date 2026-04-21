@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "950019707439",
+    "project_id": "masal-dunyasi-v1",
+    "storage_bucket": "masal-dunyasi-v1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:950019707439:android:0999ace1fc9cc8127eacda",
+        "android_client_info": {
+          "package_name": "com.masaldunyasi.v1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2pQY8YJ28z9FKvJdKU6b_NYfRCEgZcG4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
