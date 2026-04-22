@@ -35,7 +35,7 @@ class _StoryBottomNav extends StatelessWidget {
   static const _items = [
     _BottomNavItem(Icons.auto_stories_rounded, 'Masallar'),
     _BottomNavItem(Icons.nightlight_round, 'Uyku'),
-    _BottomNavItem(Icons.play_circle_rounded, '\u0130zle'),
+    _BottomNavItem(Icons.emoji_events_rounded, 'Rozet'),
     _BottomNavItem(Icons.bookmark_rounded, 'Kitapl\u0131k'),
   ];
 

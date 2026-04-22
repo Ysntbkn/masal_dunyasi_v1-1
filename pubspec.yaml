@@ -30,9 +30,11 @@ flutter:
     - "asset/login page/Arkaplan.jpeg"
     - "asset/avatar page/avatar_optimized.jpeg"
     - "asset/home page/"
+    - "asset/profil page/background_optimized.jpg"
+    - "asset/profil page/profile_background_optimized.jpg"
+    - "asset/rozet page/arkaplan_optimized.jpg"
     - "asset/books/"
-    - "asset/icons/close.svg"
-    - "asset/icons/geri.svg"
+    - "asset/icons/"
 
   fonts:
     - family: BreadMateTR

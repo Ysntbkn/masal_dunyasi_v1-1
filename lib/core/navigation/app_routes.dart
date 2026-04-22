@@ -10,6 +10,7 @@ abstract final class AppRoutes {
   static const sleep = '/sleep';
   static const watch = '/watch';
   static const profile = '/profile';
+  static const search = '/search';
 
   static const categories = '/categories';
   static const categoryDetail = '/categories/:categoryId';

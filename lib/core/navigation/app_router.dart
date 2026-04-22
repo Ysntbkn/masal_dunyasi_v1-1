@@ -12,13 +12,13 @@ import '../../features/home/home_screen.dart';
 import '../../features/library/library_screen.dart';
 import '../../features/premium/premium_screen.dart';
 import '../../features/profile/profile_screen.dart';
+import '../../features/search/search_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/sleep/sleep_screen.dart';
 import '../../features/story/audio_player_screen.dart';
 import '../../features/story/reading_screen.dart';
 import '../../features/story/story_detail_screen.dart';
 import '../../features/trial/trial_screen.dart';
-import '../../features/watch/watch_screen.dart';
 import '../../shared/widgets/app_shell.dart';
 import '../state/app_state.dart';
 import 'app_routes.dart';
@@ -26,7 +26,7 @@ import 'app_routes.dart';
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 final shellNavigatorHomeKey = GlobalKey<NavigatorState>();
 final shellNavigatorSleepKey = GlobalKey<NavigatorState>();
-final shellNavigatorWatchKey = GlobalKey<NavigatorState>();
+final shellNavigatorAchievementsKey = GlobalKey<NavigatorState>();
 final shellNavigatorLibraryKey = GlobalKey<NavigatorState>();
 
 GoRouter createAppRouter(AppState appState) {
@@ -110,12 +110,12 @@ GoRouter createAppRouter(AppState appState) {
             ],
           ),
           StatefulShellBranch(
-            navigatorKey: shellNavigatorWatchKey,
+            navigatorKey: shellNavigatorAchievementsKey,
             routes: [
               GoRoute(
-                path: AppRoutes.watch,
-                name: 'watch',
-                builder: (context, state) => const WatchScreen(),
+                path: AppRoutes.achievements,
+                name: 'achievements',
+                builder: (context, state) => const AchievementsScreen(),
               ),
             ],
           ),
@@ -136,6 +136,12 @@ GoRouter createAppRouter(AppState appState) {
         name: 'profile',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.search,
+        name: 'search',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const SearchScreen(),
       ),
       GoRoute(
         path: AppRoutes.storyDetail,
@@ -174,12 +180,6 @@ GoRouter createAppRouter(AppState appState) {
             categoryId: state.pathParameters['categoryId']!,
           );
         },
-      ),
-      GoRoute(
-        path: AppRoutes.achievements,
-        name: 'achievements',
-        parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) => const AchievementsScreen(),
       ),
       GoRoute(
         path: AppRoutes.settings,
