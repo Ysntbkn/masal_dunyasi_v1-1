@@ -13,7 +13,6 @@ class AvatarSelectionScreen extends StatelessWidget {
   const AvatarSelectionScreen({super.key});
 
   static const String _heroImage = 'asset/avatar page/avatar_optimized.jpeg';
-  static const String _backIcon = 'asset/icons/geri.svg';
 
   static const List<_AvatarOption> _avatars = [
     _AvatarOption('prenses', Color(0xFFF4B46F), Icons.face_4_rounded),
@@ -38,7 +37,6 @@ class AvatarSelectionScreen extends StatelessWidget {
             children: [
               AuthHeroSection(
                 imagePath: _heroImage,
-                backIconPath: _backIcon,
                 imageAlignment: const Alignment(0, 0.72),
                 onBack: () => context.go(AppRoutes.name),
               ),

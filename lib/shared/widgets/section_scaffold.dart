@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
+import 'app_back_button.dart';
 
 class SectionScaffold extends StatelessWidget {
   const SectionScaffold({
@@ -17,7 +18,14 @@ class SectionScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title), actions: actions),
+      appBar: AppBar(
+        leadingWidth: AppBackButtonAppBarLeading.leadingWidth,
+        leading: AppBackButtonAppBarLeading(
+          onTap: () => Navigator.of(context).maybePop(),
+        ),
+        title: Text(title),
+        actions: actions,
+      ),
       body: SafeArea(
         top: false,
         child: ListView(

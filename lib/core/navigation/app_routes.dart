@@ -7,6 +7,8 @@ abstract final class AppRoutes {
 
   static const home = '/home';
   static const library = '/library';
+  static const libraryCompleted = '/library/completed';
+  static const libraryFavorites = '/library/favorites';
   static const sleep = '/sleep';
   static const watch = '/watch';
   static const profile = '/profile';
@@ -23,6 +25,8 @@ abstract final class AppRoutes {
   static const storyTrial = '/trial/:storyId';
 
   static String category(String categoryId) => '/categories/$categoryId';
+  static String libraryCollection(bool favorites) =>
+      favorites ? libraryFavorites : libraryCompleted;
   static String story(String storyId) => '/story/$storyId';
   static String readStory(String storyId) => '/story/$storyId/read';
   static String trialStory(String storyId) => '/trial/$storyId';

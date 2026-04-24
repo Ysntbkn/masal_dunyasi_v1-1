@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../core/state/app_state.dart';
 import '../../shared/theme/app_theme.dart';
+import '../../shared/widgets/app_back_button.dart';
 
 enum _PremiumPlan { monthly, yearly }
 
@@ -121,48 +122,7 @@ class _PremiumTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _TopIconButton(
-          icon: Icons.chevron_left_rounded,
-          tooltip: 'Geri',
-          onTap: onBack,
-        ),
-        const Spacer(),
-      ],
-    );
-  }
-}
-
-class _TopIconButton extends StatelessWidget {
-  const _TopIconButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: const Color(0xFFA84E2B),
-        borderRadius: BorderRadius.circular(3),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(3),
-          child: SizedBox(
-            width: 44,
-            height: 44,
-            child: Icon(icon, color: Colors.white, size: 28),
-          ),
-        ),
-      ),
-    );
+    return AppHeaderBar(onBack: onBack, horizontalPadding: 0);
   }
 }
 

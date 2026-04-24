@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/widgets/app_back_button.dart';
 
 abstract final class AuthOnboardingMetrics {
   static const double heroHeightFactor = 0.55;
@@ -34,13 +34,11 @@ class AuthHeroSection extends StatelessWidget {
   const AuthHeroSection({
     super.key,
     required this.imagePath,
-    required this.backIconPath,
     required this.onBack,
     this.imageAlignment = Alignment.topCenter,
   });
 
   final String imagePath;
-  final String backIconPath;
   final VoidCallback onBack;
   final AlignmentGeometry imageAlignment;
 
@@ -61,17 +59,8 @@ class AuthHeroSection extends StatelessWidget {
             child: Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: const EdgeInsets.only(top: 32, left: 28),
-                child: SizedBox(
-                  width: 39,
-                  height: 39,
-                  child: IconButton(
-                    onPressed: onBack,
-                    padding: EdgeInsets.zero,
-                    icon: SvgPicture.asset(backIconPath),
-                    tooltip: 'Geri',
-                  ),
-                ),
+                padding: const EdgeInsets.only(top: 28, left: 28),
+                child: AppBackButton(onTap: onBack),
               ),
             ),
           ),

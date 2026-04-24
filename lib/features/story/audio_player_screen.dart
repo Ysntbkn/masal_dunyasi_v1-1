@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/state/app_state.dart';
 import '../../shared/theme/app_theme.dart';
+import '../../shared/widgets/app_back_button.dart';
 
 class AudioPlayerScreen extends StatelessWidget {
   const AudioPlayerScreen({super.key});
@@ -12,7 +13,13 @@ class AudioPlayerScreen extends StatelessWidget {
     final state = context.watch<AppState>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Ses Oynatıcı')),
+      appBar: AppBar(
+        leadingWidth: AppBackButtonAppBarLeading.leadingWidth,
+        leading: AppBackButtonAppBarLeading(
+          onTap: () => Navigator.of(context).maybePop(),
+        ),
+        title: const Text('Ses Oynat\u0131c\u0131'),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -30,7 +37,7 @@ class AudioPlayerScreen extends StatelessWidget {
               ),
               const SizedBox(height: 22),
               Text(
-                state.activeAudioTitle ?? 'Henüz bir ses seçilmedi',
+                state.activeAudioTitle ?? 'Hen\u00fcz bir ses se\u00e7ilmedi',
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: AppColors.cinnamon, fontSize: 32),
               ),

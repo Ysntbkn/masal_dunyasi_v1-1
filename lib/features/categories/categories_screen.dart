@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/navigation/app_routes.dart';
 import '../../shared/theme/app_theme.dart';
+import '../../shared/widgets/app_back_button.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -19,7 +20,13 @@ class CategoriesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Kategoriler')),
+      appBar: AppBar(
+        leadingWidth: AppBackButtonAppBarLeading.leadingWidth,
+        leading: AppBackButtonAppBarLeading(
+          onTap: () => Navigator.of(context).maybePop(),
+        ),
+        title: const Text('Kategoriler'),
+      ),
       body: GridView.builder(
         padding: const EdgeInsets.fromLTRB(18, 12, 18, 120),
         itemCount: categories.length,

@@ -9,6 +9,7 @@ import '../../features/auth/name_input_screen.dart';
 import '../../features/categories/categories_screen.dart';
 import '../../features/categories/category_detail_screen.dart';
 import '../../features/home/home_screen.dart';
+import '../../features/library/library_collection_screen.dart';
 import '../../features/library/library_screen.dart';
 import '../../features/premium/premium_screen.dart';
 import '../../features/profile/profile_screen.dart';
@@ -142,6 +143,22 @@ GoRouter createAppRouter(AppState appState) {
         name: 'search',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const SearchScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.libraryCompleted,
+        name: 'library-completed',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const LibraryCollectionScreen(
+          kind: LibraryCollectionKind.completed,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.libraryFavorites,
+        name: 'library-favorites',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const LibraryCollectionScreen(
+          kind: LibraryCollectionKind.favorites,
+        ),
       ),
       GoRoute(
         path: AppRoutes.storyDetail,

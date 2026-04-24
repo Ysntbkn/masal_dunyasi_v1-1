@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../../core/achievements/badge_catalog.dart';
 import '../../core/navigation/app_routes.dart';
+import '../../core/state/app_state.dart';
+import '../../shared/widgets/app_back_button.dart';
 
 class AchievementsScreen extends StatelessWidget {
   const AchievementsScreen({super.key});
@@ -12,6 +15,9 @@ class AchievementsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final heroHeight = (screenHeight * 0.42).clamp(360.0, 430.0);
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark.copyWith(
         statusBarColor: Colors.transparent,
@@ -19,11 +25,12 @@ class AchievementsScreen extends StatelessWidget {
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFF1F5C98),
+        backgroundColor: const Color(0xFF2A66A4),
         body: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
               child: _AchievementsHero(
+                height: heroHeight,
                 onBack: () {
                   if (context.canPop()) {
                     context.pop();
@@ -34,17 +41,18 @@ class AchievementsScreen extends StatelessWidget {
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(32, 24, 32, 44),
+              padding: const EdgeInsets.fromLTRB(28, 8, 28, 148),
               sliver: SliverGrid.builder(
-                itemCount: 9,
+                itemCount: badgeCatalog.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
-                  mainAxisSpacing: 38,
-                  crossAxisSpacing: 34,
-                  childAspectRatio: 0.93,
+                  mainAxisSpacing: 20,
+                  crossAxisSpacing: 18,
+                  childAspectRatio: 0.88,
                 ),
                 itemBuilder: (context, index) {
-                  return const _BadgeSlot();
+                  final badge = badgeCatalog[index];
+                  return _BadgeSlot(badge: badge);
                 },
               ),
             ),
@@ -56,16 +64,15 @@ class AchievementsScreen extends StatelessWidget {
 }
 
 class _AchievementsHero extends StatelessWidget {
-  const _AchievementsHero({required this.onBack});
+  const _AchievementsHero({required this.height, required this.onBack});
 
+  final double height;
   final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
-    final topPadding = MediaQuery.paddingOf(context).top;
-
     return SizedBox(
-      height: 590,
+      height: height,
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -82,41 +89,34 @@ class _AchievementsHero extends StatelessWidget {
                 colors: [
                   Colors.black.withValues(alpha: 0.08),
                   Colors.transparent,
-                  const Color(0xFF1F5C98).withValues(alpha: 0.12),
-                  const Color(0xFF1F5C98),
+                  const Color(0xFF2A66A4).withValues(alpha: 0.18),
+                  const Color(0xFF2A66A4),
                 ],
                 stops: const [0, 0.58, 0.82, 1],
               ),
             ),
           ),
-          Positioned(
-            top: topPadding + 56,
-            left: 40,
-            child: Tooltip(
-              message: 'Geri',
-              child: GestureDetector(
-                onTap: onBack,
-                child: SvgPicture.asset(
-                  'asset/icons/geri.svg',
-                  width: 56,
-                  height: 56,
-                ),
-              ),
-            ),
-          ),
-          const Positioned(
-            left: 0,
-            right: 0,
-            bottom: 88,
-            child: Text(
-              'ROZETLER',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'BreadMateTR',
-                fontSize: 54,
-                height: 0.92,
-                letterSpacing: 0,
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 22),
+              child: Column(
+                children: [
+                  AppHeaderBar(onBack: onBack, horizontalPadding: 0),
+                  const Spacer(),
+                  const Text(
+                    'ROZETLER',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'BreadMateTR',
+                      fontSize: 54,
+                      height: 0.92,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                ],
               ),
             ),
           ),
@@ -127,15 +127,67 @@ class _AchievementsHero extends StatelessWidget {
 }
 
 class _BadgeSlot extends StatelessWidget {
-  const _BadgeSlot();
+  const _BadgeSlot({required this.badge});
+
+  final BadgeDefinition badge;
+
+  static const _greyscaleMatrix = <double>[
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final unlocked = context.select<AppState, bool>(
+      (state) => state.isBadgeUnlocked(badge.id),
+    );
+    Widget image = Padding(
+      padding: const EdgeInsets.all(12),
+      child: Image.asset(
+        badge.assetPath,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+      ),
+    );
+
+    if (!unlocked) {
+      image = ColorFiltered(
+        colorFilter: const ColorFilter.matrix(_greyscaleMatrix),
+        child: Opacity(opacity: 0.78, child: image),
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
+      child: image,
     );
   }
 }

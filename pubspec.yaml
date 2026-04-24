@@ -17,6 +17,8 @@ dependencies:
   provider: ^6.1.5+1
   google_fonts: ^8.0.2
   just_audio: ^0.10.5
+  cloud_firestore: ^6.3.0
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:
@@ -30,9 +32,12 @@ flutter:
     - "asset/login page/Arkaplan.jpeg"
     - "asset/avatar page/avatar_optimized.jpeg"
     - "asset/home page/"
+    - "asset/sleep page/"
     - "asset/profil page/background_optimized.jpg"
     - "asset/profil page/profile_background_optimized.jpg"
     - "asset/rozet page/arkaplan_optimized.jpg"
+    - "asset/rozetler/"
+    - "asset/audio/"
     - "asset/books/"
     - "asset/icons/"
 

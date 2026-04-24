@@ -18,7 +18,6 @@ class NameInputScreen extends StatefulWidget {
 
 class _NameInputScreenState extends State<NameInputScreen> {
   static const String _heroImage = 'asset/login page/Arkaplan.jpeg';
-  static const String _backIcon = 'asset/icons/geri.svg';
 
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
@@ -50,7 +49,6 @@ class _NameInputScreenState extends State<NameInputScreen> {
             children: [
               AuthHeroSection(
                 imagePath: _heroImage,
-                backIconPath: _backIcon,
                 onBack: () => context.go(AppRoutes.login),
               ),
               _NamePanel(

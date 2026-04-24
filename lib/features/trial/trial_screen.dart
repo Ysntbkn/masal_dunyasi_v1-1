@@ -6,7 +6,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +14,7 @@ import '../../core/navigation/app_routes.dart';
 import '../../core/state/app_state.dart';
 import '../../features/auth/widgets/auth_onboarding_widgets.dart';
 import '../../shared/theme/app_theme.dart';
+import '../../shared/widgets/app_back_button.dart';
 
 enum _TrialTab { stories, sounds }
 
@@ -28,7 +28,6 @@ class TrialScreen extends StatefulWidget {
 }
 
 class _TrialScreenState extends State<TrialScreen> {
-  static const String _backIcon = 'asset/icons/geri.svg';
   static const Duration _previewDuration = Duration(seconds: 4);
 
   final AudioPlayer _player = AudioPlayer();
@@ -201,7 +200,7 @@ class _TrialScreenState extends State<TrialScreen> {
 
                 return Column(
                   children: [
-                    _TrialHeader(backIconPath: _backIcon, onBack: _goBack),
+                    _TrialHeader(onBack: _goBack),
                     SizedBox(height: titleGap),
                     _TrialToggle(
                       selectedTab: _selectedTab,
@@ -233,46 +232,25 @@ class _TrialScreenState extends State<TrialScreen> {
 }
 
 class _TrialHeader extends StatelessWidget {
-  const _TrialHeader({required this.backIconPath, required this.onBack});
+  const _TrialHeader({required this.onBack});
 
   static const double height = 48;
 
-  final String backIconPath;
   final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: SizedBox(
-              width: 39,
-              height: 39,
-              child: IconButton(
-                onPressed: onBack,
-                padding: EdgeInsets.zero,
-                icon: SvgPicture.asset(backIconPath),
-                tooltip: 'Geri',
-              ),
-            ),
-          ),
-          const Text(
-            '\u00d6NCE DENE',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.cinnamon,
-              fontFamily: 'BreadMateTR',
-              fontSize: 46,
-              fontWeight: FontWeight.w400,
-              height: 0.92,
-              letterSpacing: 0,
-            ),
-          ),
-        ],
+    return AppHeaderBar(
+      onBack: onBack,
+      horizontalPadding: 0,
+      title: 'ÖNCE DENE',
+      titleStyle: const TextStyle(
+        color: AppColors.cinnamon,
+        fontFamily: 'BreadMateTR',
+        fontSize: 46,
+        fontWeight: FontWeight.w400,
+        height: 0.92,
+        letterSpacing: 0,
       ),
     );
   }

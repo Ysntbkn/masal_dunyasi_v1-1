@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             SliverPadding(
-              padding: EdgeInsets.fromLTRB(18, isPremium ? 28 : 18, 18, 28),
+              padding: EdgeInsets.fromLTRB(18, isPremium ? 28 : 18, 18, 0),
               sliver: SliverList.list(
                 children: [
                   SectionHeader(title: 'Yeteneklerini Ke\u015ffet'),
@@ -144,10 +144,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     stories: _skills,
                   ),
                   const SizedBox(height: 24),
-                  AllCategories(tags: _tags),
                 ],
               ),
             ),
+            SliverToBoxAdapter(child: AllCategories(tags: _tags)),
           ],
         ),
       ),
@@ -894,62 +894,56 @@ class AllCategories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
-
-    return OverflowBox(
-      minWidth: screenWidth,
-      maxWidth: screenWidth,
-      child: Container(
-        width: screenWidth,
-        padding: const EdgeInsets.fromLTRB(22, 32, 22, 38),
-        color: const Color(0xFFF1ECE6),
-        child: Column(
-          children: [
-            const Text(
-              'T\u00dcM KATEGOR\u0130LER',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.cinnamon,
-                fontFamily: 'BreadMateTR',
-                fontSize: 43,
-                height: 0.96,
-                letterSpacing: 0,
-              ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(22, 32, 22, 38),
+      color: const Color(0xFFF1ECE6),
+      child: Column(
+        children: [
+          const Text(
+            'T\u00dcM KATEGOR\u0130LER',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.cinnamon,
+              fontFamily: 'BreadMateTR',
+              fontSize: 43,
+              height: 0.96,
+              letterSpacing: 0,
             ),
-            const SizedBox(height: 26),
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 12,
-              runSpacing: 14,
-              children: [
-                for (final tag in tags)
-                  ActionChip(
-                    onPressed: () =>
-                        context.push(AppRoutes.category(tag.toLowerCase())),
-                    label: SizedBox(
-                      width: 92,
-                      child: Text(
-                        tag,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    backgroundColor: Colors.white,
-                    side: BorderSide.none,
-                    shape: const StadiumBorder(),
-                    labelPadding: const EdgeInsets.symmetric(vertical: 7),
-                    labelStyle: const TextStyle(
-                      color: AppColors.ink,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0,
+          ),
+          const SizedBox(height: 26),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            runSpacing: 14,
+            children: [
+              for (final tag in tags)
+                ActionChip(
+                  onPressed: () =>
+                      context.push(AppRoutes.category(tag.toLowerCase())),
+                  label: SizedBox(
+                    width: 92,
+                    child: Text(
+                      tag,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
                   ),
-              ],
-            ),
-          ],
-        ),
+                  backgroundColor: Colors.white,
+                  side: BorderSide.none,
+                  shape: const StadiumBorder(),
+                  labelPadding: const EdgeInsets.symmetric(vertical: 7),
+                  labelStyle: const TextStyle(
+                    color: AppColors.ink,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0,
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

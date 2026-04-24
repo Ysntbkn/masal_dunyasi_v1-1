@@ -2,13 +2,13 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/app_routes.dart';
 import '../../core/state/app_state.dart';
 import '../../shared/theme/app_theme.dart';
+import '../../shared/widgets/app_back_button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -39,7 +39,7 @@ class ProfileScreen extends StatelessWidget {
               child: CustomScrollView(
                 slivers: [
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(28, 18, 28, 28),
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
                     sliver: SliverList.list(
                       children: [
                         _ProfileTopBar(
@@ -58,6 +58,7 @@ class ProfileScreen extends StatelessWidget {
                           name: name,
                           email: email,
                           isPremium: state.isPremium,
+                          onEdit: () => _showEditProfileSheet(context, state),
                         ),
                         const SizedBox(height: 40),
                         _PremiumButton(
@@ -78,13 +79,13 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 18),
                         const _GoalCard(
                           iconPath: 'asset/icons/gunluk hedef.webp',
-                          title: 'G\u00fcnl\u00fck Hedef',
+                          title: 'Günlük Hedef',
                           progress: 0.58,
                         ),
                         const SizedBox(height: 20),
                         const _GoalCard(
-                          iconPath: 'asset/icons/ayl\u0131k hedef.webp',
-                          title: 'Ayl\u0131k Hedef',
+                          iconPath: 'asset/icons/aylık hedef.webp',
+                          title: 'Aylık Hedef',
                           progress: 0.58,
                         ),
                         const SizedBox(height: 28),
@@ -97,6 +98,20 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showEditProfileSheet(BuildContext context, AppState state) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return ChangeNotifierProvider.value(
+          value: state,
+          child: const _EditProfileSheet(),
+        );
+      },
     );
   }
 }
@@ -151,58 +166,39 @@ class _ProfileTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _ProfileIconButton(
-          iconPath: 'asset/icons/geri.svg',
-          tooltip: 'Geri',
-          onTap: onBack,
-        ),
-        const Expanded(
-          child: Text(
-            'PROF\u0130L\u0130M',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'BreadMateTR',
-              fontSize: 43,
-              height: 0.92,
-              letterSpacing: 0,
-            ),
-          ),
-        ),
-        _ProfileIconButton(
-          iconPath: 'asset/icons/ayarlar.svg',
-          tooltip: 'Ayarlar',
-          onTap: onSettings,
-        ),
-      ],
+    return AppHeaderBar(
+      onBack: onBack,
+      horizontalPadding: 0,
+      title: 'PROFİLİM',
+      titleStyle: const TextStyle(
+        color: Colors.white,
+        fontFamily: 'BreadMateTR',
+        fontSize: 43,
+        height: 0.92,
+        letterSpacing: 0,
+      ),
+      trailing: _SettingsButton(onTap: onSettings),
     );
   }
 }
 
-class _ProfileIconButton extends StatelessWidget {
-  const _ProfileIconButton({
-    required this.iconPath,
-    required this.tooltip,
-    required this.onTap,
-  });
+class _SettingsButton extends StatelessWidget {
+  const _SettingsButton({required this.onTap});
 
-  final String iconPath;
-  final String tooltip;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(7),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(7),
-          child: SvgPicture.asset(iconPath, width: 44, height: 44),
+    return Material(
+      color: const Color(0xFFA5471B),
+      borderRadius: BorderRadius.circular(11),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(11),
+        child: const SizedBox(
+          width: 44,
+          height: 44,
+          child: Icon(Icons.settings_rounded, color: Colors.white, size: 25),
         ),
       ),
     );
@@ -215,12 +211,14 @@ class _ProfileCard extends StatelessWidget {
     required this.name,
     required this.email,
     required this.isPremium,
+    required this.onEdit,
   });
 
   final _ProfileAvatarStyle avatar;
   final String name;
   final String email;
   final bool isPremium;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -249,17 +247,21 @@ class _ProfileCard extends StatelessWidget {
               Positioned(
                 right: -4,
                 top: 14,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFE5E5E5),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.edit_rounded,
-                    color: Colors.black,
-                    size: 21,
+                child: Material(
+                  color: const Color(0xFFE5E5E5),
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    onTap: onEdit,
+                    customBorder: const CircleBorder(),
+                    child: const SizedBox(
+                      width: 42,
+                      height: 42,
+                      child: Icon(
+                        Icons.edit_rounded,
+                        color: Colors.black,
+                        size: 21,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -417,11 +419,11 @@ class _StatCard extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Positioned(
-            top: -25,
+            top: -20,
             child: Image.asset(
               iconPath,
-              width: 72,
-              height: 58,
+              width: 80,
+              height: 66,
               fit: BoxFit.contain,
             ),
           ),
@@ -440,7 +442,7 @@ class _StatCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.ink,
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
@@ -500,7 +502,7 @@ class _GoalCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 const Text(
-                  'Bug\u00fcnk\u00fc okuma s\u00fcresi',
+                  'Bugünkü okuma süresi',
                   style: TextStyle(
                     color: Color(0xFF8A8A8A),
                     fontSize: 12,
@@ -537,6 +539,296 @@ class _GoalCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _EditProfileSheet extends StatefulWidget {
+  const _EditProfileSheet();
+
+  @override
+  State<_EditProfileSheet> createState() => _EditProfileSheetState();
+}
+
+class _EditProfileSheetState extends State<_EditProfileSheet> {
+  late final TextEditingController _nameController;
+  late String _selectedAvatar;
+  int _step = 0;
+
+  static const _avatars = [
+    _AvatarOption('prenses', Color(0xFFF4B46F), Icons.face_4_rounded),
+    _AvatarOption('kirmizi-baslik', Color(0xFF9ED6C0), Icons.face_3_rounded),
+    _AvatarOption('buyucu', Color(0xFF7B789E), Icons.face_6_rounded),
+    _AvatarOption('gezgin', Color(0xFFF0C07A), Icons.face_2_rounded),
+    _AvatarOption('dedektif', Color(0xFFB6D79F), Icons.face_rounded),
+    _AvatarOption('denizci', Color(0xFF86CFC7), Icons.face_retouching_natural),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    final state = context.read<AppState>();
+    _nameController = TextEditingController(
+      text: state.userName.trim().isEmpty ? 'Demet' : state.userName,
+    );
+    _selectedAvatar = state.avatar;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 220),
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFF6EE),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 54,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD9C9BB),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  _step == 0 ? 'Adını Düzenle' : 'Avatarını Seç',
+                  style: const TextStyle(
+                    color: AppColors.cinnamon,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  _step == 0
+                      ? 'Önce profil adını güncelleyelim.'
+                      : 'Şimdi profil avatarını seçebilirsin.',
+                  style: const TextStyle(
+                    color: Color(0xFF7E6F62),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0,
+                  ),
+                ),
+                const SizedBox(height: 22),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 180),
+                  child: _step == 0 ? _buildNameStep() : _buildAvatarStep(),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    if (_step == 1) ...[
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => setState(() => _step = 0),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(54),
+                            side: const BorderSide(color: AppColors.cinnamon),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: const Text('Geri'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: _handlePrimaryAction,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.cinnamon,
+                          minimumSize: const Size.fromHeight(54),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: Text(_step == 0 ? 'Devam Et' : 'Kaydet'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNameStep() {
+    return Column(
+      key: const ValueKey('name-step'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Profil Adı',
+          style: TextStyle(
+            color: Color(0xFF6D5B4D),
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _nameController,
+          textInputAction: TextInputAction.done,
+          decoration: InputDecoration(
+            hintText: 'Adını yaz',
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 16,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAvatarStep() {
+    return Column(
+      key: const ValueKey('avatar-step'),
+      children: [
+        for (var row = 0; row < 2; row++) ...[
+          Row(
+            children: [
+              for (final avatar in _avatars.skip(row * 3).take(3)) ...[
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: _AvatarChoice(
+                      option: avatar,
+                      selected: _selectedAvatar == avatar.id,
+                      onTap: () => setState(() => _selectedAvatar = avatar.id),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          if (row == 0) const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+
+  void _handlePrimaryAction() {
+    if (_step == 0) {
+      setState(() => _step = 1);
+      return;
+    }
+
+    final state = context.read<AppState>();
+    state.saveName(_nameController.text);
+    state.selectAvatar(_selectedAvatar);
+    Navigator.of(context).pop();
+  }
+}
+
+class _AvatarChoice extends StatelessWidget {
+  const _AvatarChoice({
+    required this.option,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _AvatarOption option;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(26),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFFFFE6D6) : Colors.white,
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(
+              color: selected ? AppColors.cinnamon : const Color(0xFFE7D7CB),
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: option.color,
+                ),
+                child: Icon(option.icon, color: Colors.white, size: 42),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                option.label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: selected
+                      ? AppColors.cinnamon
+                      : const Color(0xFF6D5B4D),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AvatarOption {
+  const _AvatarOption(this.id, this.color, this.icon);
+
+  final String id;
+  final Color color;
+  final IconData icon;
+
+  String get label => switch (id) {
+    'prenses' => 'Prenses',
+    'kirmizi-baslik' => 'Kırmızı Başlık',
+    'buyucu' => 'Büyücü',
+    'gezgin' => 'Gezgin',
+    'dedektif' => 'Dedektif',
+    'denizci' => 'Denizci',
+    _ => 'Avatar',
+  };
 }
 
 class _ProfileAvatarStyle {
