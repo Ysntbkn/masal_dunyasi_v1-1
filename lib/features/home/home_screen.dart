@@ -75,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final isPremium = context.watch<AppState>().isPremium;
+    final bottomSafeGap = MediaQuery.paddingOf(context).bottom + 124;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark.copyWith(
@@ -147,7 +148,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            SliverToBoxAdapter(child: AllCategories(tags: _tags)),
+            SliverToBoxAdapter(
+              child: AllCategories(
+                tags: _tags,
+                bottomPadding: bottomSafeGap,
+              ),
+            ),
           ],
         ),
       ),
@@ -888,15 +894,20 @@ class CategoryStrip extends StatelessWidget {
 }
 
 class AllCategories extends StatelessWidget {
-  const AllCategories({super.key, required this.tags});
+  const AllCategories({
+    super.key,
+    required this.tags,
+    this.bottomPadding = 38,
+  });
 
   final List<String> tags;
+  final double bottomPadding;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(22, 32, 22, 38),
+      padding: EdgeInsets.fromLTRB(22, 32, 22, bottomPadding),
       color: const Color(0xFFF1ECE6),
       child: Column(
         children: [

@@ -48,7 +48,7 @@ class AchievementsScreen extends StatelessWidget {
                   crossAxisCount: 3,
                   mainAxisSpacing: 20,
                   crossAxisSpacing: 18,
-                  childAspectRatio: 0.88,
+                  childAspectRatio: 0.92,
                 ),
                 itemBuilder: (context, index) {
                   final badge = badgeCatalog[index];
@@ -160,7 +160,7 @@ class _BadgeSlot extends StatelessWidget {
       (state) => state.isBadgeUnlocked(badge.id),
     );
     Widget image = Padding(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(4),
       child: Image.asset(
         badge.assetPath,
         fit: BoxFit.contain,
@@ -175,19 +175,98 @@ class _BadgeSlot extends StatelessWidget {
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _showPreview(context, unlocked),
+        borderRadius: BorderRadius.circular(24),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ],
+          child: Padding(
+            padding: const EdgeInsets.all(1),
+            child: image,
+          ),
+        ),
       ),
-      child: image,
+    );
+  }
+
+  Future<void> _showPreview(BuildContext context, bool unlocked) {
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: const Color(0xFFFFF9F2),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  badge.title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFF2F2A25),
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Container(
+                  width: 240,
+                  height: 240,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  child: unlocked
+                      ? Image.asset(badge.assetPath, fit: BoxFit.contain)
+                      : ColorFiltered(
+                          colorFilter: const ColorFilter.matrix(
+                            _greyscaleMatrix,
+                          ),
+                          child: Opacity(
+                            opacity: 0.78,
+                            child: Image.asset(
+                              badge.assetPath,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                ),
+                const SizedBox(height: 18),
+                FilledButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF2A66A4),
+                    minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                  ),
+                  child: const Text('Kapat'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

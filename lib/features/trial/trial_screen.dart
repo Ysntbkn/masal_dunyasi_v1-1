@@ -147,7 +147,17 @@ class _TrialScreenState extends State<TrialScreen> {
   Future<void> _continueToHome() async {
     await _stopPreview();
     if (!mounted) return;
-    context.read<AppState>().completeOnboarding();
+    if (widget.storyId != null) {
+      context.go(AppRoutes.story(widget.storyId!));
+      return;
+    }
+
+    final appState = context.read<AppState>();
+    if (!appState.onboardingComplete) {
+      appState.completeOnboarding();
+      return;
+    }
+
     context.go(AppRoutes.home);
   }
 

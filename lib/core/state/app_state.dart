@@ -94,6 +94,10 @@ class AppState extends ChangeNotifier {
 
   static const _prefsProfileIdKey = 'app_state.profile_id';
   static const _prefsLibraryKey = 'app_state.library_json';
+  static const _prefsLanguageKey = 'app_state.language_code';
+  static const _prefsAppRatingKey = 'app_state.app_rating';
+  static const _prefsFeedbackMessageKey = 'app_state.feedback_message';
+  static const _prefsFeedbackAtKey = 'app_state.feedback_at';
 
   bool _hasSession = false;
   bool _onboardingComplete = false;
@@ -105,6 +109,9 @@ class AppState extends ChangeNotifier {
   String? _activeAudioTitle;
   AudioSourceType? _activeAudioType;
   String? _profileId;
+  String? _lastFeedbackMessage;
+  int? _lastFeedbackAtMillis;
+  int _appRating = 0;
 
   SharedPreferences? _prefs;
   FirebaseFirestore? _firestore;
@@ -126,6 +133,9 @@ class AppState extends ChangeNotifier {
   String? get activeAudioTitle => _activeAudioTitle;
   AudioSourceType? get activeAudioType => _activeAudioType;
   bool get hasActiveAudio => _activeAudioTitle != null;
+  String? get lastFeedbackMessage => _lastFeedbackMessage;
+  int? get lastFeedbackAtMillis => _lastFeedbackAtMillis;
+  int get appRating => _appRating;
   int get unlockedBadgeCount => _unlockedBadgeIds.length;
   Set<String> get unlockedBadgeIds =>
       Set<String>.unmodifiable(_unlockedBadgeIds);
@@ -188,6 +198,11 @@ class AppState extends ChangeNotifier {
   }
 
   void _loadLocalState() {
+    _languageCode = _prefs?.getString(_prefsLanguageKey) ?? _languageCode;
+    _appRating = (_prefs?.getInt(_prefsAppRatingKey) ?? 0).clamp(0, 5).toInt();
+    _lastFeedbackMessage = _prefs?.getString(_prefsFeedbackMessageKey);
+    _lastFeedbackAtMillis = _prefs?.getInt(_prefsFeedbackAtKey);
+
     final encoded = _prefs?.getString(_prefsLibraryKey);
     if (encoded == null || encoded.isEmpty) return;
 
@@ -298,6 +313,19 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> _saveLocalState() async {
+    await _prefs?.setString(_prefsLanguageKey, _languageCode);
+    await _prefs?.setInt(_prefsAppRatingKey, _appRating);
+    if (_lastFeedbackMessage == null || _lastFeedbackMessage!.isEmpty) {
+      await _prefs?.remove(_prefsFeedbackMessageKey);
+    } else {
+      await _prefs?.setString(_prefsFeedbackMessageKey, _lastFeedbackMessage!);
+    }
+    if (_lastFeedbackAtMillis == null) {
+      await _prefs?.remove(_prefsFeedbackAtKey);
+    } else {
+      await _prefs?.setInt(_prefsFeedbackAtKey, _lastFeedbackAtMillis!);
+    }
+
     final encoded = jsonEncode({
       'stories': {
         for (final item in _libraryItems.values) item.storyId: item.toJson(),
@@ -421,6 +449,24 @@ class AppState extends ChangeNotifier {
   void setLanguage(String languageCode) {
     if (_languageCode == languageCode) return;
     _languageCode = languageCode;
+    unawaited(_saveLocalState());
+    notifyListeners();
+  }
+
+  void submitFeedback(String message) {
+    final normalized = message.trim();
+    if (normalized.isEmpty) return;
+    _lastFeedbackMessage = normalized;
+    _lastFeedbackAtMillis = DateTime.now().millisecondsSinceEpoch;
+    unawaited(_saveLocalState());
+    notifyListeners();
+  }
+
+  void setAppRating(int rating) {
+    final normalized = rating.clamp(0, 5).toInt();
+    if (_appRating == normalized) return;
+    _appRating = normalized;
+    unawaited(_saveLocalState());
     notifyListeners();
   }
 

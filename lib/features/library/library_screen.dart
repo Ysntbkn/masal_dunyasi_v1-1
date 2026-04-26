@@ -142,7 +142,7 @@ class _LibraryHero extends StatelessWidget {
                   AppHeaderBar(onBack: onBack, horizontalPadding: 0),
                   const Spacer(),
                   const Text(
-                    'KUTUPHANE',
+                    'K\u00dcT\u00dcPHANE',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,

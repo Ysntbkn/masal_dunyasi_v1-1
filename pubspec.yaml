@@ -19,6 +19,8 @@ dependencies:
   just_audio: ^0.10.5
   cloud_firestore: ^6.3.0
   shared_preferences: ^2.5.5
+  page_flip: ^0.2.5+1
+  confetti: ^0.8.0
 
 dev_dependencies:
   flutter_test:
@@ -32,6 +34,7 @@ flutter:
     - "asset/login page/Arkaplan.jpeg"
     - "asset/avatar page/avatar_optimized.jpeg"
     - "asset/home page/"
+    - "asset/kategoriler page/"
     - "asset/sleep page/"
     - "asset/profil page/background_optimized.jpg"
     - "asset/profil page/profile_background_optimized.jpg"

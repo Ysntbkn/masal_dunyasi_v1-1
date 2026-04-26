@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +10,7 @@ import '../../core/achievements/badge_catalog.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../core/state/app_state.dart';
 import '../theme/app_theme.dart';
+import 'global_confetti_burst.dart';
 
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.navigationShell});
@@ -18,11 +19,29 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: _StoryBottomNav(
-        selectedIndex: navigationShell.currentIndex,
-        onSelected: navigationShell.goBranch,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark.copyWith(
+        systemNavigationBarColor: const Color(0xFFFFF3E6),
+        systemNavigationBarIconBrightness: Brightness.dark,
+        systemNavigationBarContrastEnforced: false,
+      ),
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          if (navigationShell.currentIndex != 0) {
+            navigationShell.goBranch(0);
+          }
+        },
+        child: Scaffold(
+          extendBody: true,
+          backgroundColor: const Color(0xFFFFF3E6),
+          body: navigationShell,
+          bottomNavigationBar: _StoryBottomNav(
+            selectedIndex: navigationShell.currentIndex,
+            onSelected: navigationShell.goBranch,
+          ),
+        ),
       ),
     );
   }
@@ -41,39 +60,109 @@ class _StoryBottomNav extends StatelessWidget {
     _BottomNavItem(Icons.auto_stories_rounded, 'Masallar'),
     _BottomNavItem(Icons.nightlight_round, 'Uyku'),
     _BottomNavItem(Icons.emoji_events_rounded, 'Rozet'),
-    _BottomNavItem(Icons.bookmark_rounded, 'Kitaplik'),
+    _BottomNavItem(Icons.bookmark_rounded, 'Kitaplık'),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(22, 8, 22, 12),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 22,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            for (var i = 0; i < _items.length; i++)
-              Expanded(
-                child: _BottomNavButton(
-                  item: _items[i],
-                  selected: selectedIndex == i,
-                  onTap: () => onSelected(i),
-                ),
+    const totalHeight = 90.0;
+    const bodyTop = 23.0;
+    const highlightRadius = 24.0;
+    const sideMargin = 6.0;
+    const bottomGap = 10.0;
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+
+    return SizedBox(
+      height: totalHeight + bottomInset + bottomGap,
+      child: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: bottomInset,
+            child: const ColoredBox(color: Color(0xFFFFF3E6)),
+          ),
+          SafeArea(
+            top: false,
+            minimum: const EdgeInsets.fromLTRB(6, 0, 6, 10),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(end: selectedIndex.toDouble()),
+                duration: const Duration(milliseconds: 340),
+                curve: Curves.easeOutCubic,
+                builder: (context, animatedIndex, _) {
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final slotWidth =
+                          (constraints.maxWidth - (sideMargin * 2)) /
+                          _items.length;
+                      final activeCenterX =
+                          sideMargin +
+                          (animatedIndex * slotWidth) +
+                          (slotWidth / 2);
+
+                      return SizedBox(
+                        height: totalHeight,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            CustomPaint(
+                              size: const Size(double.infinity, totalHeight),
+                              painter: _BottomNavSurfacePainter(
+                                activeCenterX: activeCenterX,
+                                bodyTop: bodyTop,
+                                highlightRadius: highlightRadius,
+                              ),
+                              child: const SizedBox.expand(),
+                            ),
+                            Positioned.fill(
+                              top: bodyTop + 10,
+                              bottom: 8,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: sideMargin,
+                                ),
+                                child: Row(
+                                  children: [
+                                    for (var i = 0; i < _items.length; i++)
+                                      Expanded(
+                                        child: _BottomNavButton(
+                                          item: _items[i],
+                                          selected: selectedIndex == i,
+                                          onTap: () => onSelected(i),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: activeCenterX - highlightRadius,
+                              top: bodyTop - highlightRadius,
+                              width: highlightRadius * 2,
+                              height: highlightRadius * 2,
+                              child: IgnorePointer(
+                                child: Center(
+                                  child: Icon(
+                                    _items[selectedIndex].icon,
+                                    color: AppColors.cinnamon,
+                                    size: 29,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -92,40 +181,171 @@ class _BottomNavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(22),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        height: 52,
-        decoration: BoxDecoration(
-          color: selected ? AppColors.peach.withValues(alpha: 0.65) : null,
-          borderRadius: BorderRadius.circular(22),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              item.icon,
-              color: selected ? AppColors.cinnamon : const Color(0xFFB9B1A9),
-              size: 22,
-            ),
-            const SizedBox(height: 3),
-            Text(
-              item.label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: selected ? AppColors.cinnamon : const Color(0xFFB9B1A9),
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0,
+    const passiveColor = Color(0xFFAFA8A1);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        splashColor: AppColors.cinnamon.withValues(alpha: 0.08),
+        highlightColor: AppColors.cinnamon.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(28),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                height: 27,
+                child: Center(
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 160),
+                    curve: Curves.easeOutCubic,
+                    opacity: selected ? 0 : 1,
+                    child: Icon(item.icon, color: passiveColor, size: 23),
+                  ),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOutCubic,
+                style: TextStyle(
+                  color: selected ? AppColors.cinnamon : passiveColor,
+                  fontSize: selected ? 11.5 : 10.5,
+                  fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
+                  height: 1.05,
+                  letterSpacing: -0.1,
+                ),
+                child: Text(
+                  item.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+}
+
+class _BottomNavSurfacePainter extends CustomPainter {
+  const _BottomNavSurfacePainter({
+    required this.activeCenterX,
+    required this.bodyTop,
+    required this.highlightRadius,
+  });
+
+  final double activeCenterX;
+  final double bodyTop;
+  final double highlightRadius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const barRadius = 31.0;
+    final notchRadius = highlightRadius + 9;
+
+    final clampedCenterX = activeCenterX.clamp(
+      notchRadius + 6,
+      size.width - notchRadius - 6,
+    );
+
+    final barRect = RRect.fromLTRBR(
+      6,
+      bodyTop,
+      size.width - 6,
+      size.height - 6,
+      const Radius.circular(barRadius),
+    );
+
+    final barPath = Path()..addRRect(barRect);
+
+    final notchPath = Path()
+      ..addOval(
+        Rect.fromCircle(
+          center: Offset(clampedCenterX, bodyTop),
+          radius: notchRadius,
+        ),
+      );
+
+    final surfacePath = Path.combine(
+      PathOperation.difference,
+      barPath,
+      notchPath,
+    );
+
+    canvas.drawShadow(
+      surfacePath,
+      Colors.black.withValues(alpha: 0.08),
+      18,
+      false,
+    );
+
+    final fillPaint = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFFFFFFFF), Color(0xFFFFF8F1)],
+      ).createShader(Rect.fromLTWH(0, bodyTop, size.width, size.height));
+
+    final rimPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..color = const Color(0xFFF0E3D7);
+
+    final activeCirclePaint = Paint()
+      ..shader =
+          const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFF3E4), Color(0xFFFFD9A8)],
+          ).createShader(
+            Rect.fromCircle(
+              center: Offset(clampedCenterX, bodyTop),
+              radius: highlightRadius,
+            ),
+          );
+
+    final activeCircleStroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4
+      ..color = const Color(0xFFFFC98B);
+
+    canvas.drawPath(surfacePath, fillPaint);
+    canvas.drawPath(surfacePath, rimPaint);
+
+    canvas.drawShadow(
+      Path()..addOval(
+        Rect.fromCircle(
+          center: Offset(clampedCenterX, bodyTop),
+          radius: highlightRadius,
+        ),
+      ),
+      Colors.black.withValues(alpha: 0.07),
+      10,
+      false,
+    );
+
+    canvas.drawCircle(
+      Offset(clampedCenterX, bodyTop),
+      highlightRadius,
+      activeCirclePaint,
+    );
+
+    canvas.drawCircle(
+      Offset(clampedCenterX, bodyTop),
+      highlightRadius,
+      activeCircleStroke,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _BottomNavSurfacePainter oldDelegate) {
+    return oldDelegate.activeCenterX != activeCenterX ||
+        oldDelegate.bodyTop != bodyTop ||
+        oldDelegate.highlightRadius != highlightRadius;
   }
 }
 
@@ -155,7 +375,7 @@ class AppRouteWrapper extends StatelessWidget {
           const Positioned(
             left: 16,
             right: 16,
-            bottom: 88,
+            bottom: 104,
             child: MiniPlayer(),
           ),
         const BadgeCelebrationOverlay(),
@@ -249,7 +469,6 @@ class _BadgeCelebrationOverlayState extends State<BadgeCelebrationOverlay>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   final AudioPlayer _player = AudioPlayer();
-  final List<_ConfettiParticle> _particles = <_ConfettiParticle>[];
   Timer? _dismissTimer;
   String? _currentBadgeId;
 
@@ -298,14 +517,7 @@ class _BadgeCelebrationOverlayState extends State<BadgeCelebrationOverlay>
             builder: (context, _) {
               return Stack(
                 children: [
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: _ConfettiPainter(
-                        particles: _particles,
-                        progress: Curves.easeOut.transform(_controller.value),
-                      ),
-                    ),
-                  ),
+                  GlobalConfettiBurst(trigger: badge.id),
                   Center(
                     child: Transform.scale(
                       scale: 0.92 + (_controller.value * 0.08),
@@ -388,16 +600,6 @@ class _BadgeCelebrationOverlayState extends State<BadgeCelebrationOverlay>
                       ),
                     ),
                   ),
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: CustomPaint(
-                        painter: _ConfettiPainter(
-                          particles: _particles,
-                          progress: Curves.easeOut.transform(_controller.value),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               );
             },
@@ -410,9 +612,6 @@ class _BadgeCelebrationOverlayState extends State<BadgeCelebrationOverlay>
   void _startCelebration(BadgeDefinition badge) {
     _currentBadgeId = badge.id;
     _dismissTimer?.cancel();
-    _particles
-      ..clear()
-      ..addAll(_buildParticles(badge.id.hashCode));
     _controller.forward(from: 0);
     unawaited(_playSound());
     _dismissTimer = Timer(
@@ -436,91 +635,5 @@ class _BadgeCelebrationOverlayState extends State<BadgeCelebrationOverlay>
     if (!mounted) return;
     _currentBadgeId = null;
     context.read<AppState>().dismissBadgeCelebration();
-  }
-
-  List<_ConfettiParticle> _buildParticles(int seed) {
-    final random = math.Random(seed);
-    final colors = [
-      const Color(0xFFFFC44D),
-      const Color(0xFFFF7E54),
-      const Color(0xFF63D6FF),
-      const Color(0xFFB96BFF),
-      const Color(0xFF7CDB7C),
-      const Color(0xFFFF6BA6),
-    ];
-
-    return List<_ConfettiParticle>.generate(64, (index) {
-      return _ConfettiParticle(
-        angle: (random.nextDouble() * math.pi) - (math.pi / 2),
-        distance: 120 + (random.nextDouble() * 220),
-        fall: 90 + (random.nextDouble() * 180),
-        size: 8 + (random.nextDouble() * 10),
-        color: colors[random.nextInt(colors.length)],
-      );
-    });
-  }
-}
-
-class _ConfettiParticle {
-  const _ConfettiParticle({
-    required this.angle,
-    required this.distance,
-    required this.fall,
-    required this.size,
-    required this.color,
-  });
-
-  final double angle;
-  final double distance;
-  final double fall;
-  final double size;
-  final Color color;
-}
-
-class _ConfettiPainter extends CustomPainter {
-  const _ConfettiPainter({required this.particles, required this.progress});
-
-  final List<_ConfettiParticle> particles;
-  final double progress;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height * 0.34);
-    for (final particle in particles) {
-      final dx = math.cos(particle.angle) * particle.distance * progress;
-      final dy =
-          math.sin(particle.angle) * particle.distance * progress +
-          (particle.fall * progress * progress);
-      final paint = Paint()
-        ..color = particle.color.withValues(
-          alpha: 0.18 + ((1 - progress) * 0.82),
-        );
-      final rect = Rect.fromCenter(
-        center: Offset(center.dx + dx, center.dy + dy),
-        width: particle.size,
-        height: particle.size * 0.66,
-      );
-      canvas.save();
-      canvas.translate(rect.center.dx, rect.center.dy);
-      canvas.rotate(progress * math.pi * 4);
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromCenter(
-            center: Offset.zero,
-            width: rect.width,
-            height: rect.height,
-          ),
-          Radius.circular(particle.size * 0.24),
-        ),
-        paint,
-      );
-      canvas.restore();
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _ConfettiPainter oldDelegate) {
-    return oldDelegate.progress != progress ||
-        oldDelegate.particles != particles;
   }
 }

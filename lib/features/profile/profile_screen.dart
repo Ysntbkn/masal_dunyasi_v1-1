@@ -28,6 +28,7 @@ class ProfileScreen extends StatelessWidget {
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: const Color(0xFFFF8A68),
         systemNavigationBarIconBrightness: Brightness.dark,
+        systemNavigationBarContrastEnforced: false,
       ),
       child: Scaffold(
         backgroundColor: const Color(0xFFFF8A68),
@@ -35,7 +36,6 @@ class ProfileScreen extends StatelessWidget {
           children: [
             const _ProfileBackground(),
             SafeArea(
-              bottom: false,
               child: CustomScrollView(
                 slivers: [
                   SliverPadding(
@@ -61,8 +61,11 @@ class ProfileScreen extends StatelessWidget {
                           onEdit: () => _showEditProfileSheet(context, state),
                         ),
                         const SizedBox(height: 40),
-                        _PremiumButton(
-                          onTap: () => context.push(AppRoutes.premium),
+                        Transform.translate(
+                          offset: const Offset(0, -2),
+                          child: _PremiumButton(
+                            onTap: () => context.push(AppRoutes.premium),
+                          ),
                         ),
                         const SizedBox(height: 42),
                         const _StatsRow(),
@@ -319,37 +322,77 @@ class _ProfileCard extends StatelessWidget {
   }
 }
 
-class _PremiumButton extends StatelessWidget {
+class _PremiumButton extends StatefulWidget {
   const _PremiumButton({required this.onTap});
 
   final VoidCallback onTap;
 
   @override
+  State<_PremiumButton> createState() => _PremiumButtonState();
+}
+
+class _PremiumButtonState extends State<_PremiumButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+    _scale = Tween<double>(
+      begin: 0.97,
+      end: 1.02,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(999),
-        child: Ink(
-          height: 64,
-          decoration: BoxDecoration(
+    return ScaleTransition(
+      scale: _scale,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 250),
+          child: Material(
+            color: Colors.transparent,
             borderRadius: BorderRadius.circular(999),
-            gradient: const LinearGradient(
-              colors: [Color(0xFFFF33D0), Color(0xFFFF6A3A)],
-            ),
-          ),
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(999),
-            child: const Center(
-              child: Text(
-                'Premium Ol',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
+            child: Ink(
+              height: 56,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFF33D0), Color(0xFFFF6A3A)],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFF6A3A).withValues(alpha: 0.24),
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: InkWell(
+                onTap: widget.onTap,
+                borderRadius: BorderRadius.circular(999),
+                child: const Center(
+                  child: Text(
+                    'Premium Ol',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -419,7 +462,7 @@ class _StatCard extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Positioned(
-            top: -20,
+            top: -35,
             child: Image.asset(
               iconPath,
               width: 80,

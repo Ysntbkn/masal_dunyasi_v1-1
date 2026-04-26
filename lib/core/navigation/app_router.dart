@@ -16,9 +16,9 @@ import '../../features/profile/profile_screen.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/sleep/sleep_screen.dart';
-import '../../features/story/audio_player_screen.dart';
-import '../../features/story/reading_screen.dart';
-import '../../features/story/story_detail_screen.dart';
+import '../../features/stories/presentation/story_audio_player_screen.dart';
+import '../../features/stories/presentation/story_detail_screen.dart';
+import '../../features/stories/presentation/story_reader_screen.dart';
 import '../../features/trial/trial_screen.dart';
 import '../../shared/widgets/app_shell.dart';
 import '../state/app_state.dart';
@@ -173,14 +173,14 @@ GoRouter createAppRouter(AppState appState) {
         name: 'reading',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
-          return ReadingScreen(storyId: state.pathParameters['storyId']!);
+          return StoryReaderScreen(storyId: state.pathParameters['storyId']!);
         },
       ),
       GoRoute(
         path: AppRoutes.audioPlayer,
         name: 'audio-player',
         parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) => const AudioPlayerScreen(),
+        builder: (context, state) => const StoryAudioPlayerScreen(),
       ),
       GoRoute(
         path: AppRoutes.categories,
