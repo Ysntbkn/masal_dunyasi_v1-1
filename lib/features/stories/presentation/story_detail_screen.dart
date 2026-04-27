@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../core/navigation/app_routes.dart';
 import '../../../core/state/app_state.dart';
 import '../../../core/stories/story_catalog.dart';
+import 'princess_rescue_game_screen.dart';
 import 'story_audio_player_screen.dart';
 import 'story_reader_screen.dart';
 import 'story_screen_shared.dart';
@@ -49,7 +50,7 @@ class StoryDetailScreen extends StatelessWidget {
                         child: Text(
                           storyDisplayTitle(story),
                           textAlign: TextAlign.center,
-                          style: storyTitleStyle(fontSize: 28),
+                          style: storyTitleStyle(fontSize: 30),
                         ),
                       ),
                       const SizedBox(height: 26),
@@ -73,18 +74,38 @@ class StoryDetailScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 28),
                         child: StoryPrimaryButton(
+                          label: 'Interaktif Oyunu Dene',
+                          icon: Icons.auto_awesome_rounded,
+                          color: const Color(0xFF8E74E8),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) =>
+                                    const PrincessRescueGameScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 28),
+                        child: StoryPrimaryButton(
                           label: 'Dinle',
                           icon: Icons.play_arrow_rounded,
                           color: const Color(0xFFD4B875),
                           onTap: () {
-                            context.read<AppState>().playStoryAudio(
+                            final appState = context.read<AppState>();
+                            appState.playStoryAudio(
                               story.title,
+                              storyId: storyId,
+                              imagePath: coverPath,
                             );
+                            appState.setExpandedAudioPlayerVisible(true);
                             Navigator.of(context).push(
                               MaterialPageRoute<void>(
-                                builder: (_) => StoryAudioPlayerScreen(
-                                  storyId: storyId,
-                                ),
+                                builder: (_) =>
+                                    StoryAudioPlayerScreen(storyId: storyId),
                               ),
                             );
                           },

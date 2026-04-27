@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/app_routes.dart';
+import '../../core/profile/avatar_catalog.dart';
 import '../../core/state/app_state.dart';
 import '../../shared/theme/app_theme.dart';
 
@@ -20,6 +21,22 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   static const _coverImage =
       'asset/books/freepik_cute-little-bear-standing_2791150604.png';
+
+  static const _heroSlides = [
+    HomeHeroSlide(
+      storyId: 'ormani-kesfet',
+      imagePath: 'asset/home page/maceraya çıkalım.jpg',
+    ),
+    HomeHeroSlide(
+      storyId: 'minik-dostlar',
+      imagePath: 'asset/home page/hayvanlar alemi.jpg',
+    ),
+    HomeHeroSlide(
+      storyId: 'uyku-yolculugu',
+      imagePath:
+          'asset/sleep page/freepik__a-magical-fairytale-night-scene-a-little-dreamer-s__95193.png',
+    ),
+  ];
 
   static const _adSlides = [
     AdSlide(imagePath: 'asset/home page/premium.png'),
@@ -36,6 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
     CategoryTile('hayvanlar', 'Hayvanlar', _coverImage),
     CategoryTile('uyku', 'Uyku', _coverImage),
     CategoryTile('fantastik', 'Fantastik', _coverImage),
+    CategoryTile('meslekler', 'Meslekler', _coverImage),
+    CategoryTile('klasikler', 'Klasikler', _coverImage),
+    CategoryTile('uzay', 'Uzay', _coverImage),
   ];
 
   static const _tags = [
@@ -45,15 +65,30 @@ class _HomeScreenState extends State<HomeScreen> {
     'Fantastik',
     'Hayvanlar',
     'Dostluk',
+    'Meslekler',
+    'Klasikler',
+    'Uzay',
   ];
 
+  final PageController _heroController = PageController();
   final PageController _adController = PageController();
+  Timer? _heroTimer;
   Timer? _adTimer;
+  int _heroIndex = 0;
   int _adIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _heroTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || _heroSlides.length < 2) return;
+      final next = (_heroIndex + 1) % _heroSlides.length;
+      _heroController.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeInOutCubic,
+      );
+    });
     _adTimer = Timer.periodic(const Duration(seconds: 3), (_) {
       if (!mounted || _adSlides.length < 2) return;
       final next = (_adIndex + 1) % _adSlides.length;
@@ -67,7 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _heroTimer?.cancel();
     _adTimer?.cancel();
+    _heroController.dispose();
     _adController.dispose();
     super.dispose();
   }
@@ -89,8 +126,10 @@ class _HomeScreenState extends State<HomeScreen> {
           slivers: [
             SliverToBoxAdapter(
               child: HomeHero(
-                imagePath: _coverImage,
-                onTap: () => context.push(AppRoutes.story('ucretsiz-masallar')),
+                controller: _heroController,
+                slides: _heroSlides,
+                activeIndex: _heroIndex,
+                onPageChanged: (index) => setState(() => _heroIndex = index),
                 onProfileTap: () => context.push(AppRoutes.profile),
                 onSearchTap: () => context.push(AppRoutes.search),
               ),
@@ -149,10 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SliverToBoxAdapter(
-              child: AllCategories(
-                tags: _tags,
-                bottomPadding: bottomSafeGap,
-              ),
+              child: AllCategories(tags: _tags, bottomPadding: bottomSafeGap),
             ),
           ],
         ),
@@ -164,14 +200,18 @@ class _HomeScreenState extends State<HomeScreen> {
 class HomeHero extends StatelessWidget {
   const HomeHero({
     super.key,
-    required this.imagePath,
-    required this.onTap,
+    required this.controller,
+    required this.slides,
+    required this.activeIndex,
+    required this.onPageChanged,
     required this.onProfileTap,
     required this.onSearchTap,
   });
 
-  final String imagePath;
-  final VoidCallback onTap;
+  final PageController controller;
+  final List<HomeHeroSlide> slides;
+  final int activeIndex;
+  final ValueChanged<int> onPageChanged;
   final VoidCallback onProfileTap;
   final VoidCallback onSearchTap;
 
@@ -183,61 +223,92 @@ class HomeHero extends StatelessWidget {
 
     return SizedBox(
       height: heroHeight,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(36),
-              bottomRight: Radius.circular(36),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(36),
+          bottomRight: Radius.circular(36),
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            PageView.builder(
+              controller: controller,
+              itemCount: slides.length,
+              onPageChanged: onPageChanged,
+              itemBuilder: (context, index) {
+                return _HeroStorySlide(slide: slides[index]);
+              },
             ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                  alignment: const Alignment(0.04, 0.48),
-                ),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withValues(alpha: 0.08),
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.08),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: topPadding + 44,
-                  left: 32,
-                  right: 32,
-                  height: 56,
-                  child: _HeroSearchBar(
-                    onProfileTap: onProfileTap,
-                    onSearchTap: onSearchTap,
-                  ),
-                ),
-                Positioned(
-                  left: 32,
-                  right: 32,
-                  bottom: 66,
-                  child: _HeroTitlePill(onTap: onTap),
-                ),
-                const Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 34,
-                  child: _HeroIndicators(),
-                ),
-              ],
+            Positioned(
+              top: topPadding + 44,
+              left: 32,
+              right: 32,
+              height: 56,
+              child: _HeroSearchBar(
+                onProfileTap: onProfileTap,
+                onSearchTap: onSearchTap,
+              ),
             ),
-          ),
+            Positioned(
+              left: 32,
+              right: 32,
+              bottom: 66,
+              child: _HeroTitlePill(
+                onTap: () =>
+                    context.push(AppRoutes.story(slides[activeIndex].storyId)),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 34,
+              child: _HeroIndicators(
+                itemCount: slides.length,
+                activeIndex: activeIndex,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroStorySlide extends StatelessWidget {
+  const _HeroStorySlide({required this.slide});
+
+  final HomeHeroSlide slide;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => context.push(AppRoutes.story(slide.storyId)),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              slide.imagePath,
+              fit: BoxFit.cover,
+              alignment: const Alignment(0.04, 0.38),
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.10),
+                    Colors.black.withValues(alpha: 0.04),
+                    Colors.black.withValues(alpha: 0.44),
+                    Colors.black.withValues(alpha: 0.62),
+                  ],
+                  stops: const [0, 0.38, 0.72, 1],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -252,7 +323,7 @@ class _HeroSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final avatar = _HomeAvatarStyle.fromId(context.watch<AppState>().avatar);
+    final avatar = appAvatarFor(context.watch<AppState>().avatar);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(999),
@@ -277,13 +348,15 @@ class _HeroSearchBar extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: avatar.backgroundColor,
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.74),
                       width: 2,
                     ),
+                    image: DecorationImage(
+                      image: AssetImage(avatar.imagePath),
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                  child: Icon(avatar.icon, color: Colors.white, size: 30),
                 ),
               ),
               const Spacer(),
@@ -308,46 +381,6 @@ class _HeroSearchBar extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _HomeAvatarStyle {
-  const _HomeAvatarStyle({required this.backgroundColor, required this.icon});
-
-  final Color backgroundColor;
-  final IconData icon;
-
-  static _HomeAvatarStyle fromId(String avatarId) {
-    return switch (avatarId) {
-      'prenses' => const _HomeAvatarStyle(
-        backgroundColor: Color(0xFFF4B46F),
-        icon: Icons.face_4_rounded,
-      ),
-      'kirmizi-baslik' => const _HomeAvatarStyle(
-        backgroundColor: Color(0xFF9ED6C0),
-        icon: Icons.face_3_rounded,
-      ),
-      'buyucu' => const _HomeAvatarStyle(
-        backgroundColor: Color(0xFF7B789E),
-        icon: Icons.face_6_rounded,
-      ),
-      'gezgin' => const _HomeAvatarStyle(
-        backgroundColor: Color(0xFFF0C07A),
-        icon: Icons.face_2_rounded,
-      ),
-      'dedektif' => const _HomeAvatarStyle(
-        backgroundColor: Color(0xFFB6D79F),
-        icon: Icons.face_rounded,
-      ),
-      'denizci' => const _HomeAvatarStyle(
-        backgroundColor: Color(0xFF86CFC7),
-        icon: Icons.face_retouching_natural,
-      ),
-      _ => const _HomeAvatarStyle(
-        backgroundColor: Color(0xFFF4B46F),
-        icon: Icons.face_4_rounded,
-      ),
-    };
   }
 }
 
@@ -398,20 +431,25 @@ class _HeroTitlePill extends StatelessWidget {
 }
 
 class _HeroIndicators extends StatelessWidget {
-  const _HeroIndicators();
+  const _HeroIndicators({required this.itemCount, required this.activeIndex});
+
+  final int itemCount;
+  final int activeIndex;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        _IndicatorBar(color: Colors.white, width: 38),
-        SizedBox(width: 10),
-        _IndicatorBar(color: Color(0xBFE8EFE8), width: 54),
-        SizedBox(width: 10),
-        _IndicatorBar(color: Color(0xBFE8EFE8), width: 54),
-        SizedBox(width: 10),
-        _IndicatorBar(color: Color(0xBFE8EFE8), width: 54),
+      children: [
+        for (var index = 0; index < itemCount; index++) ...[
+          if (index > 0) const SizedBox(width: 10),
+          _IndicatorBar(
+            color: activeIndex == index
+                ? Colors.white
+                : const Color(0xBFE8EFE8),
+            width: activeIndex == index ? 42 : 26,
+          ),
+        ],
       ],
     );
   }
@@ -894,11 +932,7 @@ class CategoryStrip extends StatelessWidget {
 }
 
 class AllCategories extends StatelessWidget {
-  const AllCategories({
-    super.key,
-    required this.tags,
-    this.bottomPadding = 38,
-  });
+  const AllCategories({super.key, required this.tags, this.bottomPadding = 38});
 
   final List<String> tags;
   final double bottomPadding;
@@ -923,36 +957,46 @@ class AllCategories extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 26),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 12,
-            runSpacing: 14,
-            children: [
-              for (final tag in tags)
-                ActionChip(
-                  onPressed: () =>
-                      context.push(AppRoutes.category(tag.toLowerCase())),
-                  label: SizedBox(
-                    width: 92,
-                    child: Text(
-                      tag,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const spacing = 12.0;
+              final itemWidth = (constraints.maxWidth - (spacing * 2)) / 3;
+
+              return Wrap(
+                alignment: WrapAlignment.start,
+                spacing: spacing,
+                runSpacing: 14,
+                children: [
+                  for (final tag in tags)
+                    SizedBox(
+                      width: itemWidth,
+                      child: ActionChip(
+                        onPressed: () =>
+                            context.push(AppRoutes.category(tag.toLowerCase())),
+                        label: SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            tag,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        backgroundColor: Colors.white,
+                        side: BorderSide.none,
+                        shape: const StadiumBorder(),
+                        labelPadding: const EdgeInsets.symmetric(vertical: 7),
+                        labelStyle: const TextStyle(
+                          color: AppColors.ink,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0,
+                        ),
+                      ),
                     ),
-                  ),
-                  backgroundColor: Colors.white,
-                  side: BorderSide.none,
-                  shape: const StadiumBorder(),
-                  labelPadding: const EdgeInsets.symmetric(vertical: 7),
-                  labelStyle: const TextStyle(
-                    color: AppColors.ink,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0,
-                  ),
-                ),
-            ],
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -963,6 +1007,13 @@ class AllCategories extends StatelessWidget {
 class AdSlide {
   const AdSlide({required this.imagePath});
 
+  final String imagePath;
+}
+
+class HomeHeroSlide {
+  const HomeHeroSlide({required this.storyId, required this.imagePath});
+
+  final String storyId;
   final String imagePath;
 }
 

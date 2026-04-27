@@ -35,7 +35,8 @@ class StoryDetailScreen extends StatelessWidget {
                 imagePath: story.imagePath,
                 isFavorite: isFavorite,
                 onBack: () => context.pop(),
-                onFavorite: () => context.read<AppState>().toggleFavorite(storyId),
+                onFavorite: () =>
+                    context.read<AppState>().toggleFavorite(storyId),
               ),
             ),
             SliverToBoxAdapter(
@@ -44,7 +45,9 @@ class StoryDetailScreen extends StatelessWidget {
                 child: Container(
                   decoration: const BoxDecoration(
                     color: Color(0xFFFFF6ED),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(34),
+                    ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 28, 20, 26),
@@ -78,7 +81,12 @@ class StoryDetailScreen extends StatelessWidget {
                           icon: Icons.play_arrow_rounded,
                           onTap: () {
                             final appState = context.read<AppState>();
-                            appState.playStoryAudio(story.title);
+                            appState.playStoryAudio(
+                              story.title,
+                              storyId: storyId,
+                              imagePath: story.imagePath,
+                            );
+                            appState.setExpandedAudioPlayerVisible(true);
                             context.push(AppRoutes.audioPlayer);
                           },
                         ),
@@ -124,7 +132,8 @@ class StoryDetailScreen extends StatelessWidget {
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: relatedStories.length,
-                            separatorBuilder: (_, _) => const SizedBox(width: 12),
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(width: 12),
                             itemBuilder: (context, index) {
                               final related = relatedStories[index];
                               return _RelatedStoryCard(

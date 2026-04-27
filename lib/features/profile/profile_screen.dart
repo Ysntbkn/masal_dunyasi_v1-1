@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/app_routes.dart';
+import '../../core/profile/avatar_catalog.dart';
 import '../../core/state/app_state.dart';
 import '../../shared/theme/app_theme.dart';
 import '../../shared/widgets/app_back_button.dart';
@@ -19,7 +20,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
-    final avatar = _ProfileAvatarStyle.fromId(state.avatar);
+    final avatar = appAvatarFor(state.avatar);
     final name = state.userName.trim().isEmpty ? 'Demet' : state.userName;
     final email = '${name.trim().toLowerCase()}@gmail.com';
 
@@ -217,7 +218,7 @@ class _ProfileCard extends StatelessWidget {
     required this.onEdit,
   });
 
-  final _ProfileAvatarStyle avatar;
+  final AppAvatar avatar;
   final String name;
   final String email;
   final bool isPremium;
@@ -242,10 +243,12 @@ class _ProfileCard extends StatelessWidget {
                 height: 124,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: avatar.backgroundColor,
                   border: Border.all(color: AppColors.cinnamon, width: 6),
+                  image: DecorationImage(
+                    image: AssetImage(avatar.imagePath),
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                child: Icon(avatar.icon, color: Colors.white, size: 72),
               ),
               Positioned(
                 right: -4,
@@ -596,15 +599,6 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
   late String _selectedAvatar;
   int _step = 0;
 
-  static const _avatars = [
-    _AvatarOption('prenses', Color(0xFFF4B46F), Icons.face_4_rounded),
-    _AvatarOption('kirmizi-baslik', Color(0xFF9ED6C0), Icons.face_3_rounded),
-    _AvatarOption('buyucu', Color(0xFF7B789E), Icons.face_6_rounded),
-    _AvatarOption('gezgin', Color(0xFFF0C07A), Icons.face_2_rounded),
-    _AvatarOption('dedektif', Color(0xFFB6D79F), Icons.face_rounded),
-    _AvatarOption('denizci', Color(0xFF86CFC7), Icons.face_retouching_natural),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -762,7 +756,7 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
         for (var row = 0; row < 2; row++) ...[
           Row(
             children: [
-              for (final avatar in _avatars.skip(row * 3).take(3)) ...[
+              for (final avatar in appAvatars.skip(row * 3).take(3)) ...[
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -802,7 +796,7 @@ class _AvatarChoice extends StatelessWidget {
     required this.onTap,
   });
 
-  final _AvatarOption option;
+  final AppAvatar option;
   final bool selected;
   final VoidCallback onTap;
 
@@ -831,9 +825,15 @@ class _AvatarChoice extends StatelessWidget {
                 height: 72,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: option.color,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.96),
+                    width: 2,
+                  ),
+                  image: DecorationImage(
+                    image: AssetImage(option.imagePath),
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                child: Icon(option.icon, color: Colors.white, size: 42),
               ),
               const SizedBox(height: 10),
               Text(
@@ -856,6 +856,7 @@ class _AvatarChoice extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _AvatarOption {
   const _AvatarOption(this.id, this.color, this.icon);
 
@@ -874,6 +875,7 @@ class _AvatarOption {
   };
 }
 
+// ignore: unused_element
 class _ProfileAvatarStyle {
   const _ProfileAvatarStyle({
     required this.backgroundColor,
@@ -883,6 +885,7 @@ class _ProfileAvatarStyle {
   final Color backgroundColor;
   final IconData icon;
 
+  // ignore: unused_element
   static _ProfileAvatarStyle fromId(String avatarId) {
     return switch (avatarId) {
       'prenses' => const _ProfileAvatarStyle(

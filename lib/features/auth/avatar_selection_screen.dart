@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/l10n/app_strings.dart';
 import '../../core/navigation/app_routes.dart';
+import '../../core/profile/avatar_catalog.dart';
 import '../../core/state/app_state.dart';
 import '../../shared/theme/app_theme.dart';
 import 'widgets/auth_onboarding_widgets.dart';
@@ -13,15 +14,6 @@ class AvatarSelectionScreen extends StatelessWidget {
   const AvatarSelectionScreen({super.key});
 
   static const String _heroImage = 'asset/avatar page/avatar_optimized.jpeg';
-
-  static const List<_AvatarOption> _avatars = [
-    _AvatarOption('prenses', Color(0xFFF4B46F), Icons.face_4_rounded),
-    _AvatarOption('kirmizi-baslik', Color(0xFF9ED6C0), Icons.face_3_rounded),
-    _AvatarOption('buyucu', Color(0xFF7B789E), Icons.face_6_rounded),
-    _AvatarOption('gezgin', Color(0xFFF0C07A), Icons.face_2_rounded),
-    _AvatarOption('dedektif', Color(0xFFB6D79F), Icons.face_rounded),
-    _AvatarOption('denizci', Color(0xFF86CFC7), Icons.face_retouching_natural),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +32,7 @@ class AvatarSelectionScreen extends StatelessWidget {
                 imageAlignment: const Alignment(0, 0.72),
                 onBack: () => context.go(AppRoutes.name),
               ),
-              _AvatarPanel(avatars: _avatars),
+              const _AvatarPanel(avatars: appAvatars),
             ],
           ),
         ),
@@ -52,7 +44,7 @@ class AvatarSelectionScreen extends StatelessWidget {
 class _AvatarPanel extends StatelessWidget {
   const _AvatarPanel({required this.avatars});
 
-  final List<_AvatarOption> avatars;
+  final List<AppAvatar> avatars;
 
   @override
   Widget build(BuildContext context) {
@@ -75,12 +67,12 @@ class _AvatarPanel extends StatelessWidget {
             final width = MediaQuery.sizeOf(context).width;
             final horizontalPadding =
                 AuthOnboardingMetrics.horizontalPaddingFor(width);
-            final selectorHeight = AuthOnboardingMetrics.avatarSelectorHeight(
-              compact,
-            );
-            final avatarItemSize = AuthOnboardingMetrics.avatarItemSize(
-              compact,
-            );
+            final selectorHeight =
+                AuthOnboardingMetrics.avatarSelectorHeight(compact) +
+                (compact ? 18 : 24);
+            final avatarItemSize =
+                AuthOnboardingMetrics.avatarItemSize(compact) +
+                (compact ? 12 : 18);
 
             return Padding(
               padding: EdgeInsets.fromLTRB(
@@ -125,52 +117,49 @@ class _AvatarSelectorCard extends StatelessWidget {
     required this.avatarItemSize,
   });
 
-  final List<_AvatarOption> avatars;
+  final List<AppAvatar> avatars;
   final String selectedAvatar;
   final double height;
   final double avatarItemSize;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: height,
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE6A995)),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: avatars
-                .take(3)
-                .map(
-                  (avatar) => _AvatarBubble(
-                    avatar: avatar,
-                    selected: avatar.id == selectedAvatar,
-                    size: avatarItemSize,
-                  ),
-                )
-                .toList(),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: avatars
-                .skip(3)
-                .map(
-                  (avatar) => _AvatarBubble(
-                    avatar: avatar,
-                    selected: avatar.id == selectedAvatar,
-                    size: avatarItemSize,
-                  ),
-                )
-                .toList(),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: avatars
+                  .take(3)
+                  .map(
+                    (avatar) => _AvatarBubble(
+                      avatar: avatar,
+                      selected: avatar.id == selectedAvatar,
+                      size: avatarItemSize,
+                    ),
+                  )
+                  .toList(),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: avatars
+                  .skip(3)
+                  .map(
+                    (avatar) => _AvatarBubble(
+                      avatar: avatar,
+                      selected: avatar.id == selectedAvatar,
+                      size: avatarItemSize,
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -183,7 +172,7 @@ class _AvatarBubble extends StatelessWidget {
     required this.size,
   });
 
-  final _AvatarOption avatar;
+  final AppAvatar avatar;
   final bool selected;
   final double size;
 
@@ -210,19 +199,17 @@ class _AvatarBubble extends StatelessWidget {
           height: innerSize,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: avatar.color,
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.92),
+              width: 1.5,
+            ),
+            image: DecorationImage(
+              image: AssetImage(avatar.imagePath),
+              fit: BoxFit.cover,
+            ),
           ),
-          child: Icon(avatar.icon, color: Colors.white, size: innerSize * 0.58),
         ),
       ),
     );
   }
-}
-
-class _AvatarOption {
-  const _AvatarOption(this.id, this.color, this.icon);
-
-  final String id;
-  final Color color;
-  final IconData icon;
 }

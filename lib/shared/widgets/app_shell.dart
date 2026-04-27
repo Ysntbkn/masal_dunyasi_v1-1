@@ -371,6 +371,7 @@ class AppRouteWrapper extends StatelessWidget {
         child,
         if (state.hasActiveAudio &&
             state.onboardingComplete &&
+            !state.isExpandedAudioPlayerVisible &&
             !hasBadgeCelebration)
           const Positioned(
             left: 16,
@@ -443,7 +444,10 @@ class MiniPlayer extends StatelessWidget {
               ),
             ),
             IconButton(
-              onPressed: () => context.push(AppRoutes.audioPlayer),
+              onPressed: () {
+                context.read<AppState>().setExpandedAudioPlayerVisible(true);
+                context.push(AppRoutes.audioPlayer);
+              },
               icon: const Icon(Icons.open_in_full_rounded),
             ),
             IconButton(

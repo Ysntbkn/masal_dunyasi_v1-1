@@ -32,7 +32,7 @@ flutter:
 
   assets:
     - "asset/login page/Arkaplan.jpeg"
-    - "asset/avatar page/avatar_optimized.jpeg"
+    - "asset/avatar page/"
     - "asset/home page/"
     - "asset/kategoriler page/"
     - "asset/sleep page/"

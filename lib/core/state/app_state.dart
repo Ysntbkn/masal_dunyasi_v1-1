@@ -108,6 +108,9 @@ class AppState extends ChangeNotifier {
   String _languageCode = 'tr';
   String? _activeAudioTitle;
   AudioSourceType? _activeAudioType;
+  String? _activeAudioArtworkPath;
+  String? _activeAudioStoryId;
+  bool _isExpandedAudioPlayerVisible = false;
   String? _profileId;
   String? _lastFeedbackMessage;
   int? _lastFeedbackAtMillis;
@@ -132,7 +135,10 @@ class AppState extends ChangeNotifier {
   bool get isEnglish => _languageCode == 'en';
   String? get activeAudioTitle => _activeAudioTitle;
   AudioSourceType? get activeAudioType => _activeAudioType;
+  String? get activeAudioArtworkPath => _activeAudioArtworkPath;
+  String? get activeAudioStoryId => _activeAudioStoryId;
   bool get hasActiveAudio => _activeAudioTitle != null;
+  bool get isExpandedAudioPlayerVisible => _isExpandedAudioPlayerVisible;
   String? get lastFeedbackMessage => _lastFeedbackMessage;
   int? get lastFeedbackAtMillis => _lastFeedbackAtMillis;
   int get appRating => _appRating;
@@ -480,6 +486,9 @@ class AppState extends ChangeNotifier {
     _onboardingComplete = false;
     _activeAudioTitle = null;
     _activeAudioType = null;
+    _activeAudioArtworkPath = null;
+    _activeAudioStoryId = null;
+    _isExpandedAudioPlayerVisible = false;
     notifyListeners();
   }
 
@@ -560,25 +569,38 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void playStoryAudio(String title) {
+  void playStoryAudio(String title, {String? storyId, String? imagePath}) {
     _activeAudioTitle = title;
     _activeAudioType = AudioSourceType.story;
+    _activeAudioStoryId = storyId;
+    _activeAudioArtworkPath = imagePath;
     notifyListeners();
   }
 
-  void playSleepAudio(String title) {
+  void playSleepAudio(String title, {String? imagePath}) {
     _recordActivityDay();
     _sleepListenCount += 1;
     _activeAudioTitle = title;
     _activeAudioType = AudioSourceType.sleep;
+    _activeAudioStoryId = null;
+    _activeAudioArtworkPath = imagePath;
     _evaluateBadges(announce: true);
     unawaited(_persistLibrary());
+    notifyListeners();
+  }
+
+  void setExpandedAudioPlayerVisible(bool value) {
+    if (_isExpandedAudioPlayerVisible == value) return;
+    _isExpandedAudioPlayerVisible = value;
     notifyListeners();
   }
 
   void stopAudio() {
     _activeAudioTitle = null;
     _activeAudioType = null;
+    _activeAudioArtworkPath = null;
+    _activeAudioStoryId = null;
+    _isExpandedAudioPlayerVisible = false;
     notifyListeners();
   }
 }

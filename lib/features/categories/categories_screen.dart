@@ -9,7 +9,8 @@ import '../../shared/widgets/app_back_button.dart';
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
-  static const _backgroundImage = 'asset/kategoriler page/arkaplan_optimized.jpg';
+  static const _backgroundImage =
+      'asset/kategoriler page/arkaplan_optimized.jpg';
 
   static const _categories = [
     _CategoryTileData('macera', 'Macera'),
@@ -21,6 +22,9 @@ class CategoriesScreen extends StatelessWidget {
     _CategoryTileData('hayvanlar', 'Hayvanlar'),
     _CategoryTileData('fantastik', 'Fantastik'),
     _CategoryTileData('egitici', 'E\u011fitici'),
+    _CategoryTileData('meslekler', 'Meslekler'),
+    _CategoryTileData('klasikler', 'Klasikler'),
+    _CategoryTileData('uzay', 'Uzay'),
   ];
 
   @override

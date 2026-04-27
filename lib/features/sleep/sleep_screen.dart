@@ -245,7 +245,10 @@ class _SleepTrackList extends StatelessWidget {
         return _SleepTrackCard(
           imagePath: imagePath,
           track: track,
-          onTap: () => context.read<AppState>().playSleepAudio(track.title),
+          onTap: () => context.read<AppState>().playSleepAudio(
+            track.title,
+            imagePath: imagePath,
+          ),
         );
       },
     );
