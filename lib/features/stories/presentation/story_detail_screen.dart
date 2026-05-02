@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../../../core/navigation/app_routes.dart';
 import '../../../core/state/app_state.dart';
 import '../../../core/stories/story_catalog.dart';
-import 'princess_rescue_game_screen.dart';
 import 'story_audio_player_screen.dart';
 import 'story_reader_screen.dart';
 import 'story_screen_shared.dart';
@@ -65,23 +64,6 @@ class StoryDetailScreen extends StatelessWidget {
                               MaterialPageRoute<void>(
                                 builder: (_) =>
                                     StoryReaderScreen(storyId: storyId),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 28),
-                        child: StoryPrimaryButton(
-                          label: 'Interaktif Oyunu Dene',
-                          icon: Icons.auto_awesome_rounded,
-                          color: const Color(0xFF8E74E8),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) =>
-                                    const PrincessRescueGameScreen(),
                               ),
                             );
                           },

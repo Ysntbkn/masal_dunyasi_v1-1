@@ -16,6 +16,9 @@ import '../../features/profile/profile_screen.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/sleep/sleep_screen.dart';
+import '../../features/stories/presentation/interactive_story_selection_screen.dart';
+import '../../features/stories/presentation/princess_rescue_game_screen.dart';
+import '../../features/stories/presentation/royal_day_story_screen.dart';
 import '../../features/stories/presentation/story_audio_player_screen.dart';
 import '../../features/stories/presentation/story_detail_screen.dart';
 import '../../features/stories/presentation/story_reader_screen.dart';
@@ -166,6 +169,32 @@ GoRouter createAppRouter(AppState appState) {
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
           return StoryDetailScreen(storyId: state.pathParameters['storyId']!);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.interactiveStories,
+        name: 'interactive-stories',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const InteractiveStorySelectionScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.interactiveStoryDetail,
+        name: 'interactive-story-detail',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final storyKey = state.pathParameters['storyKey']!;
+
+          switch (storyKey) {
+            case 'royal-day':
+              return const RoyalDayStoryScreen();
+            case 'princess-rescue':
+            case 'tony-ball':
+            case 'moon-forest':
+            case 'little-dragon':
+              return const PrincessRescueGameScreen();
+          }
+
+          return const InteractiveStorySelectionScreen();
         },
       ),
       GoRoute(

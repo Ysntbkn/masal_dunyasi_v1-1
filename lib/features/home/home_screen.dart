@@ -155,6 +155,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 10),
                   HorizontalStoryList(items: _skills),
                   const SizedBox(height: 22),
+                  SectionHeader(title: 'İnteraktif Masallar'),
+                  const SizedBox(height: 10),
+                  InteractiveStoryHighlightCard(
+                    title: 'Prensesi Zindandan Kurtar',
+                    subtitle:
+                        'Dokun, keşfet ve görevleri tamamlayarak masalın içine gir.',
+                    imagePath: 'asset/home page/maceraya çıkalım.jpg',
+                    onTap: () => context.push(AppRoutes.interactiveStories),
+                  ),
+                  const SizedBox(height: 22),
                   CategoryBlock(
                     title: 'MACERAYA \u00c7IKALIM',
                     subtitle:
@@ -834,6 +844,175 @@ class CategoryBlock extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 18, 12, 22),
                   child: _CategoryStoryCarousel(stories: stories),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class InteractiveStoryHighlightCard extends StatelessWidget {
+  const InteractiveStoryHighlightCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.imagePath,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final String imagePath;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(28),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF6550D8), Color(0xFF8B6AEE), Color(0xFFFFC18F)],
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x22000000),
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.28,
+                    child: Image.asset(imagePath, fit: BoxFit.cover),
+                  ),
+                ),
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.10),
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.18),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(22, 22, 22, 22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 7,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.22),
+                          ),
+                        ),
+                        child: const Text(
+                          'YENİ BÖLÜM',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          height: 1.05,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.16),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.touch_app_rounded,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'İnteraktif',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          Container(
+                            width: 46,
+                            height: 46,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.arrow_forward_rounded,
+                              color: Color(0xFF6D54D6),
+                              size: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

@@ -18,6 +18,8 @@ abstract final class AppRoutes {
   static const categoryDetail = '/categories/:categoryId';
   static const storyDetail = '/story/:storyId';
   static const reading = '/story/:storyId/read';
+  static const interactiveStories = '/interactive-stories';
+  static const interactiveStoryDetail = '/interactive-stories/:storyKey';
   static const audioPlayer = '/audio';
   static const achievements = '/achievements';
   static const settings = '/settings';
@@ -27,6 +29,8 @@ abstract final class AppRoutes {
   static String category(String categoryId) => '/categories/$categoryId';
   static String libraryCollection(bool favorites) =>
       favorites ? libraryFavorites : libraryCompleted;
+  static String interactiveStory(String storyKey) =>
+      '/interactive-stories/$storyKey';
   static String story(String storyId) => '/story/$storyId';
   static String readStory(String storyId) => '/story/$storyId/read';
   static String trialStory(String storyId) => '/trial/$storyId';
