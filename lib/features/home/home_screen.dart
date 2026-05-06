@@ -10,6 +10,9 @@ import '../../core/navigation/app_routes.dart';
 import '../../core/profile/avatar_catalog.dart';
 import '../../core/state/app_state.dart';
 import '../../shared/theme/app_theme.dart';
+import '../choice_stories/data/choice_story_data.dart';
+import '../choice_stories/data/models/choice_story.dart';
+import '../choice_stories/presentation/choice_story_reader_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -163,6 +166,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         'Dokun, keşfet ve görevleri tamamlayarak masalın içine gir.',
                     imagePath: 'asset/home page/maceraya çıkalım.jpg',
                     onTap: () => context.push(AppRoutes.interactiveStories),
+                  ),
+                  const SizedBox(height: 22),
+                  SectionHeader(title: 'Sen Seç, Masal Değişsin'),
+                  const SizedBox(height: 10),
+                  ChoiceStoryHorizontalList(
+                    stories: choiceStories,
+                    onStoryTap: (story) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              ChoiceStoryReaderScreen(choiceStory: story),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 22),
                   CategoryBlock(
@@ -1017,6 +1034,184 @@ class InteractiveStoryHighlightCard extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChoiceStoryHorizontalList extends StatelessWidget {
+  const ChoiceStoryHorizontalList({
+    super.key,
+    required this.stories,
+    required this.onStoryTap,
+  });
+
+  final List<ChoiceStory> stories;
+  final ValueChanged<ChoiceStory> onStoryTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 236,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: stories.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 16),
+        itemBuilder: (context, index) {
+          final story = stories[index];
+          return SizedBox(
+            width: 240,
+            child: ChoiceStoryPreviewCard(
+              story: story,
+              onTap: () => onStoryTap(story),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ChoiceStoryPreviewCard extends StatelessWidget {
+  const ChoiceStoryPreviewCard({
+    super.key,
+    required this.story,
+    required this.onTap,
+  });
+
+  final ChoiceStory story;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(26),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(26),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFFFE6C6), Color(0xFFFFF7E7), Color(0xFFE9F5FF)],
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x14000000),
+                blurRadius: 18,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 10,
+                    child: Image.asset(
+                      story.coverAsset,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const _ChoiceStoryCardPlaceholder();
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  story.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.cinnamon,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    height: 1.12,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  story.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.ink,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                  ),
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FilledButton(
+                    onPressed: onTap,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF8B6AE8),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    child: const Text('Başla'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChoiceStoryCardPlaceholder extends StatelessWidget {
+  const _ChoiceStoryCardPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFEFD8), Color(0xFFF6E9FF), Color(0xFFE2F5FF)],
+        ),
+      ),
+      child: const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.auto_stories_rounded,
+              size: 42,
+              color: AppColors.cinnamon,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Masal Kapağı',
+              style: TextStyle(
+                color: AppColors.cinnamon,
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
         ),
       ),
     );

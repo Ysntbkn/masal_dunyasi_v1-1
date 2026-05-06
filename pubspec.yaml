@@ -2,7 +2,7 @@ name: masal_dunyasi_v1
 description: "Masal Dunyasi mobile app."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ^3.11.0
@@ -37,6 +37,11 @@ flutter:
     - "asset/login page/Arkaplan.jpeg"
     - "asset/avatar page/"
     - "asset/home page/"
+    - "asset/interactive_game/task1/background_optimized.jpg"
+    - "asset/interactive_game/task1/back_button.png"
+    - "asset/interactive_game/task1/inventory.png"
+    - "asset/interactive_game/task1/key.png"
+    - "asset/interactive_game/task1/prompt.png"
     - "asset/kategoriler page/"
     - "asset/sleep page/"
     - "asset/profil page/background_optimized.jpg"
